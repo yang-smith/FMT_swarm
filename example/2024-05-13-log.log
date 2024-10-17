@@ -1,0 +1,24 @@
+2024-05-13 18:39:19,747 - main.py[line:20] - ERROR: 程序发生了错误:
+
+Exception Type: NameError
+Exception Value: name 'sys' is not defined
+details: Traceback (most recent call last):
+  File "app\ui\mainview.py", line 417, in output
+  File "app\ui\menu\export.py", line 61, in __init__
+NameError: name 'sys' is not defined
+
+未知错误类型，可参考 https://blog.lc044.love/post/7 解决该问题
+
+您可添加QQ群发送log文件以便解决该问题
+2024-05-13 20:10:18,056 - main.py[line:20] - ERROR: 程序发生了错误:
+
+Exception Type: NameError
+Exception Value: name 'sys' is not defined
+details: Traceback (most recent call last):
+  File "app\ui\mainview.py", line 417, in output
+  File "app\ui\menu\export.py", line 61, in __init__
+NameError: name 'sys' is not defined
+
+未知错误类型，可参考 https://blog.lc044.love/post/7 解决该问题
+
+您可添加QQ群发送log文件以便解决该问题
