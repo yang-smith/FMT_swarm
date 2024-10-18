@@ -27,6 +27,7 @@ paul_graham_essay.txt -> 20241017_paul_graham_what_i_worked_on.txt
 小说_大雁的庆典.txt -> 20241017_小说_大雁的庆典.txt
 新建 文本文档.txt -> 20241017_新建文本文档.txt
 ```
+[示例](./demo.png)
 
 ## 视频演示
 

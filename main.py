@@ -3,6 +3,8 @@ from tkinter import ttk, filedialog, messagebox
 from src.utils.reader import get_file_previews, get_file_list
 from src.utils.api_client_factory import get_client
 from src.utils.prompts import recognize_filename_patterns_prompt, rename_files_prompt
+import json
+import re
 
 class FileRenameApp:
     def __init__(self, root):
@@ -115,12 +117,19 @@ class FileRenameApp:
             model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
         )
-        self.pattern = response.choices[0].message.content
+        full_response = response.choices[0].message.content
+        
+        # 使用正则表达式提取命名规则设计及之后的内容
+        pattern_match = re.search(r'命名规则设计：([\s\S]*)', full_response)
+        if pattern_match:
+            self.pattern = pattern_match.group(1).strip()
+        else:
+            self.pattern = full_response
         
         self.preview_text.delete(1.0, tk.END)
         self.preview_text.insert(tk.END, f"识别的文件名模式:\n\n{self.pattern}")
         self.status_bar.config(text="文件名模式识别完成")
-        self.preview_text.edit_modified(False)  
+        self.preview_text.edit_modified(False)
 
     def generate_suggestions(self):
         if not self.current_directory:
@@ -141,9 +150,30 @@ class FileRenameApp:
         )
         suggestions = response.choices[0].message.content
         
-        # 直接将 AI 返回的内容放入重命名建议框
-        self.rename_text.delete(1.0, tk.END)
-        self.rename_text.insert(tk.END, suggestions)
+        try:
+            # 使用正则表达式提取 JSON 内容
+            json_match = re.search(r'\{[\s\S]*\}', suggestions)
+            if json_match:
+                json_content = json_match.group(0)
+                suggestions_data = json.loads(json_content)
+                
+                # 创建用户友好的文本输出
+                friendly_output = "重命名建议：\n\n"
+                for file in suggestions_data['renamed_files']:
+                    friendly_output += f"原文件名: {file['original_name']}\n"
+                    friendly_output += f"新文件名: {file['new_name']}\n"
+                    friendly_output += f"解释: {file['explanation']}\n\n"
+                
+                # 将友好的文本输出放入重命名建议框
+                self.rename_text.delete(1.0, tk.END)
+                self.rename_text.insert(tk.END, friendly_output)
+            else:
+                raise ValueError("无法在响应中找到 JSON 内容")
+        except (json.JSONDecodeError, ValueError) as e:
+            # 如果 JSON 解析失败或未找到 JSON 内容，显示错误信息和原始内容
+            error_message = f"解析建议时出错: {str(e)}\n\n原始响应:\n{suggestions}"
+            self.rename_text.delete(1.0, tk.END)
+            self.rename_text.insert(tk.END, error_message)
         
         self.status_bar.config(text="重命名建议生成完成")
 
